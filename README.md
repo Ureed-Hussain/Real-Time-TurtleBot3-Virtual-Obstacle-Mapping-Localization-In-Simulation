@@ -460,7 +460,269 @@ Automatically Rviz is open and you will see this:
 
 After runing this just save the rough map, because later we need the Resoulation of map to convert the robot pose coordinates into the map
 
+[Remote PC]
 ~~~
 ros2 run nav2_map_server map_saver_cli -f ~/map
 ~~~
+
+
+## Step 3: Run Virtual Map Builder:
+
+### Mathematics and Logic Behind
+
+#### 1. Transforming Robot Pose into Map Coordinates
+
+
+The robot’s position (x,y,θ) is obtained from the TF transform map → base_link.
+To compute yaw from quaternion q=(x,y,z,w), the standard equation is used:
+
+$$
+θ = atan2(2(wz+xy),1−2(y2+z2))
+$$
+
+This gives the robot’s heading angle in the 2D map.
+
+#### 2. Computing Left and Right Corridor Boundary Points
+
+The corridor boundaries are offset from the robot by fixed distances 
+L (left) and R (right), perpendicular to the heading.
+
+
+A perpendicular direction to heading θ is θ ± π/2.
+Thus, the world-coordinate positions of the left and right boundary points are:
+
+$$
+\begin{aligned}
+x_L &= x + L \cos\left(\theta + \frac{\pi}{2}\right) \\
+y_L &= y + L \sin\left(\theta + \frac{\pi}{2}\right) \\
+x_R &= x + R \cos\left(\theta - \frac{\pi}{2}\right) \\
+y_R &= y + R \sin\left(\theta - \frac{\pi}{2}\right)
+\end{aligned}
+$$
+
+These points trace the corridor walls as the robot moves.
+
+#### 3. Converting World Coordinates to Map Pixel Coordinates
+
+The occupancy grid map uses pixel coordinates with the origin at the top-left, while ROS2 uses a metric coordinate frame (origin at map origin).
+Using map resolution r (meters per pixel) and origin (x0,y0):
+
+$$
+\begin{aligned}
+p_x &= \frac{x - x_0}{r}, \\
+p_y &= \mathrm{height} - 1 - \frac{y - y_0}{r}
+\end{aligned}
+$$
+
+The Y-axis is flipped because image coordinates increase downward.
+
+#### 4. Forming the Virtual Corridor Polygon
+
+The collected left boundary points and the reversed right boundary points form a closed polygon:
+
+$$
+\begin{aligned}
+P=[L1​,L2​,…,Ln​,Rn​,Rn−1​,…,R1​]
+\end{aligned}
+$$
+
+This polygon represents the drivable corridor around the robot.
+
+#### 5. Filling Corridor Interior (Image Space)
+
+OpenCV’s polygon fill marks the interior region as free (white) and the exterior as occupied (black):
+
+$$
+\text{canvas}(x, y) = 
+\begin{cases}
+255 \text{ (white)}, & \text{if } (x, y) \in P \\
+0 \text{ (black)}, & \text{otherwise}
+\end{cases}
+$$
+
+An optional dilation enlarges the corridor by a structuring kernel (navigation safety margin).
+
+#### 6. Converting Image Map to ROS OccupancyGrid
+
+ROS2 uses values:
+
+* 0 = free
+
+* 100 = occupied
+
+Thus the conversion is:
+
+**Image to Occupancy Grid Mapping:**
+
+$$
+\begin{aligned}
+\text{canvas}(x, y) &= 
+\begin{cases}
+255, & (x, y) \in P \\
+0, & (x, y) \notin P
+\end{cases} \\
+\text{occ}(x, y) &= 
+\begin{cases}
+0, & \text{canvas}(x, y) = 255 \\
+100, & \text{canvas}(x, y) = 0
+\end{cases}
+\end{aligned}
+$$
+
+The image is vertically flipped before publishing, aligning image coordinates with ROS map coordinates.
+
+#### 7. Saving the Final Virtual Map
+
+PGM format uses:
+
+* 254 = free,
+
+* 0 = occupied.
+
+Thus:
+
+**Complete Image to PGM Pipeline:**
+
+$$
+\begin{aligned}
+\text{canvas}(x, y) &= 
+\begin{cases}
+255, & (x, y) \in P \\
+0, & (x, y) \notin P
+\end{cases} \\
+\text{occ}(x, y) &= 
+\begin{cases}
+0, & \text{canvas}(x, y) = 255 \\
+100, & \text{canvas}(x, y) = 0
+\end{cases} \\
+\text{pgm}(x, y) &= 
+\begin{cases}
+254, & \text{canvas}(x, y) = 255 \\
+0, & \text{canvas}(x, y) = 0
+\end{cases}
+\end{aligned}
+$$
+
+The YAML file stores resolution, origin, and thresholds for Nav2 map loading.
+
+### How to Run the code:
+
+Run the Following commands on each Terminal:
+[TurtleBot3 SBC]
+
+~~~
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_bringup robot.launch.py
+~~~
+[TurtleBot3 SBC]
+
+~~~
+ros2 run camera_ros camera_node --ros-args -p format:='RGB888'
+~~~
+
+[Remote PC]
+
+Terminal 1:
+~~~
+ros2 launch turtlebot3_autorace_camera intrinsic_camera_calibration.launch.py
+~~~
+
+Terminal 2:
+~~~
+ros2 launch turtlebot3_autorace_camera extrinsic_camera_calibration.launch.py
+~~~
+
+Terminal 3:
+~~~
+ros2 launch turtlebot3_autorace_detect detect_lane.launch.py
+~~~
+
+Terminal 4:
+~~~
+ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True
+~~~
+
+Change the Left and Right offset that we have calculate in get lane offset In the virtual_map_builder script.
+
+Then Run
+
+Terminal 5:
+~~~
+ros2 run mapping_lane_tracking virtual_map_builder
+~~~
+
+In Rviz Windown Change the Map topic to /virtual_map:
+
+<img width="1118" height="765" alt="image" src="https://github.com/user-attachments/assets/ee76b199-27fe-424d-a115-94b52a10e31a" />
+
+Terminal 6:
+~~~
+ros2 launch turtlebot3_autorace_mission control_lane.launch.py
+~~~
+
+[Screencast from 11-29-2025 11:47:22 PM.webm](https://github.com/user-attachments/assets/b70b8810-495f-49f5-8cd4-aa0e795dfe30)
+
+When robot explore the full map then run the command to save the map:
+
+Terminal 7:
+~~~
+ros2 run nav2_map_server map_saver_cli -f ~/my_virtual_map -t /virtual_map
+~~~
+
+<img width="613" height="510" alt="image" src="https://github.com/user-attachments/assets/b6e0530a-0549-4053-b5c1-9b2083350b55" />
+
+After saved the map you got two files one is my_virtual_map.pgm file and other is my_virtual_map.yaml 
+
+# Part 3: Navigation
+
+In this Virtual map Normal parameters of Turtelbot3_navigation2 is not work very well so for this we should update the burger_cam.yaml file:
+
+which is located:
+ 
+ ~~~
+ ~/ros2_ws/src/turtlebot3/turtlebot3_navigation2/param/humble
+ ~~~
+
+reduce the robot size:
+~~~
+local_costmap:
+robot_radius: 0.05
+inflation_radius: 0.5
+global_costmap:
+robot_radius: 0.05
+inflation_radius: 0.1
+~~~
+
+Then run:
+
+~~~
+cd ~/turtlebot3_ws && colcon build --symlink-install
+~~~
+
+After Colcon build Open gazebo and load your map.
+
+Terminal 1:
+
+~~~
+ros2 launch turtlebot3_gazebo turtlebot3_autorace_2020.launch.py
+~~~
+
+
+Terminal 2:
+
+~~~
+ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/my_virtual_map.yaml
+~~~
+
+First Estimate the pose:
+
+<img width="940" height="817" alt="image" src="https://github.com/user-attachments/assets/da35dde4-d559-4c82-b238-60c225c5fdd6" />
+
+Then send the goal using Nav2 Goal:
+
+
+[Screencast from 11-30-2025 12:56:47 AM.webm](https://github.com/user-attachments/assets/2769e0e0-2bd6-4c64-85d7-7640775a8cc2)
+
+
+
 

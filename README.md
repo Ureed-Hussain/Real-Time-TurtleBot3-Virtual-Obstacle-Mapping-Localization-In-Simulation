@@ -723,6 +723,10 @@ Then send the goal using Nav2 Goal:
 
 [Screencast from 11-30-2025 12:56:47 AM.webm](https://github.com/user-attachments/assets/2769e0e0-2bd6-4c64-85d7-7640775a8cc2)
 
+## Future Work
+In future work, a key improvement is to increase the reliability of navigation, as the robot occasionally drifts outside the intended driving corridor. A promising solution is to replace the standard global costmap with a lane-corridor mask generated directly from the lane-detection system. By converting the detected lane boundaries into an occupancy mask—where all pixels outside the lane are marked as obstacles (100) and all pixels inside the lane are marked as free space (0)—Nav2 will be constrained to plan only within the lane. This approach effectively transforms the TurtleBot3 into a lane-aware autonomous robot, similar to the behavior of real self-driving cars, and can significantly improve path-planning accuracy and stability.
+
+
 
 
 

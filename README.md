@@ -16,7 +16,9 @@ This is very important step, For this I recommended to follow this tutorial " ht
 Use a black and white Checkerboard, usually 7×6 or 8×6 in size, print it out and attach it to a solid surface, and measure the squares of your checkerboard accurately.
 
 ### 2. Install the ROS 2 Camera Calibration Package
+
 [Remote PC]
+
 ~~~
 sudo apt update
 sudo apt install ros-${ROS_DISTRO}-camera-calibration
@@ -48,7 +50,9 @@ Topic lists:
 
 ### 4. Run calibration node
 Specify the size of the checkerboard and the size of the squares as execution arguments. The size of the checkerboard is the number of intersections.
+
 [Remote PC]
+
 ~~~
 ros2 run camera_calibration cameracalibrator \
   --size 8x6 --square 0.023 \
@@ -62,7 +66,9 @@ When a checkerboard is detected, each intersection is connected. Modify the posi
 
 ### 6. Apply calibration
 Use the results to modify the format of the calibration yaml file you created when you installed the camera package.
+
 [Result]
+
 ~~~
 **** Calibrating ****
 mono pinhole calibration...
@@ -277,6 +283,7 @@ ros2 run camera_ros camera_node --ros-args -p format:='RGB888'
 ~~~
 
 Next, run the camera calibration processes, which ensure that the detected lanes are accurately mapped to the robot’s perspective:
+
 [Remote PC]
 ~~~
 ros2 launch turtlebot3_autorace_camera intrinsic_camera_calibration.launch.py
@@ -446,6 +453,7 @@ A positive value means the robot is shifted left; a negative value means it is s
 First clone the "slam_lane_tracking_ros2" package. 
 
 First run the gazebo world:
+
 [TurtleBot3 SBC]
 ~~~
 ros2 run camera_ros camera_node --ros-args -p format:='RGB888'

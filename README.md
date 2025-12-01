@@ -26,12 +26,14 @@ source /opt/ros/${ROS_DISTRO}/setup.bash
 ### 3. Run the Camera node
 First connect with turtlebot by their IP using "ssh", and then Run the camera node based on the camera package you installed.
 * For camera-ros
+
 [TurtleBot3 SBC]
 ~~~
 ros2 run camera_ros camera_node --ros-args -p format:='RGB888'
 ~~~
 
 After runing this command verify you got camera topics.
+
 [Remote PC]
 ~~~
 ros2 topic list
@@ -172,7 +174,9 @@ rqt
 
 and you clearly see you got rectify image:
 
-##################################################### RQT IMAGE #######################################################
+
+<img width="1162" height="552" alt="image" src="https://github.com/user-attachments/assets/41b2b808-d0ca-49bc-99f7-7048582ad440" />
+
 
 
 ## Step 3: Extrinsic calibration
@@ -197,8 +201,11 @@ This will activate the nodes responsible for camera-to-ground projection and com
    The first topic shows an image with a red trapezoidal shape and the latter shows the ground projected view (Bird’s eye view).
    
 
-   ############### add normal image and projected image ######################
+<img width="1159" height="497" alt="image" src="https://github.com/user-attachments/assets/265f1de0-34dd-485f-a83a-56dfbb7bc577" />
+
+
    /camera/image_extrinsic_calib (Left) and /camera/image_projected (Right)
+   
 4. Navigate to Plugins > Configuration > Dynamic Reconfigure.
 5. Adjust the parameters in /camera/image_projection and /camera/image_compensation to tune the camera’s calibration.
 
@@ -207,7 +214,8 @@ This will activate the nodes responsible for camera-to-ground projection and com
 
     Adjust /camera/image_compensation to fine-tune the /camera/image_projected bird’s-eye view.
 
-<img width="1155" height="704" alt="image" src="https://github.com/user-attachments/assets/f353715a-637a-4da1-9abf-29b9b678d63c" />
+<img width="1176" height="500" alt="image" src="https://github.com/user-attachments/assets/1bf65a83-f496-4034-935b-66af07b15e4d" />
+
 
 ### Saving Calibration Data
 Once the best projection settings are found, the calibration data must be saved to ensure that the parameters persist across sessions. One way to save the extrinsic calibration data is by manually editing the YAML configuration files.  
@@ -224,7 +232,8 @@ Once the best projection settings are found, the calibration data must be saved 
 
 This method ensures that the extrinsic calibration parameters are correctly saved for future runs.
 
-<img width="881" height="287" alt="image" src="https://github.com/user-attachments/assets/d81beb00-d911-47bf-beee-23909ec6e1b4" />
+<img width="851" height="288" alt="image" src="https://github.com/user-attachments/assets/3ee61212-2876-45a1-86db-4253078d96bc" />
+
 
 ### Check Calibration Result
 After completing the calibration process, follow the instructions below on the Remote PC to verify the calibration results.
@@ -247,7 +256,10 @@ After completing the calibration process, follow the instructions below on the R
    ~~~
 4. With successful calibration settings, the bird-eye view image should appear like below when the /camera/image_projected topic is selected.
 
-   ####################projected image#################################
+
+<img width="1224" height="515" alt="image" src="https://github.com/user-attachments/assets/af41e986-7a16-4686-9745-c0ab247abdbe" />
+
+
 
 ## Step 4: Lane Detection
 Lane detection allows the TurtleBot3 to recognize lane markings and follow them autonomously. The system processes camera images from a real TurtleBot3 , applies color filtering, and identifies lane boundaries.

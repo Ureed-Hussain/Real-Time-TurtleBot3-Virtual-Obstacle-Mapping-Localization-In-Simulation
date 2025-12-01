@@ -508,14 +508,18 @@ ros2 launch turtlebot3_cartographer cartographer.launch.py use_sim_time:=True
 
 Automatically Rviz is open and you will see this:
 
-<img width="1058" height="672" alt="image" src="https://github.com/user-attachments/assets/42841413-e0f1-497a-bfef-67a1b7b363c3" />
+<img width="1107" height="602" alt="image" src="https://github.com/user-attachments/assets/b9bd79f8-03c4-4533-815c-fa47d832eb84" />
+
 
 After runing this just save the rough map, because later we need the Resoulation of map to convert the robot pose coordinates into the map
 
 [Remote PC]
 ~~~
-ros2 run nav2_map_server map_saver_cli -f ~/map
+ros2 run nav2_map_server map_saver_cli -f ~/check2
 ~~~
+ we are doing this step is just for we need the value of resolution: 0.05 because this value help us to convert world coordinates into map coordinates
+ 
+<img width="783" height="347" alt="image" src="https://github.com/user-attachments/assets/4df36186-2b88-4915-bc50-5db60a069cb5" />
 
 
 ## Step 3: Run Virtual Map Builder:

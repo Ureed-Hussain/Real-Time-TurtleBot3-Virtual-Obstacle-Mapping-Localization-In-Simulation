@@ -269,13 +269,15 @@ This section explains how to launch the lane detection system, visualize the det
 ### Launching Lane Detection in Real-Turtlebot3
 
 To begin, start the Turtlebot3 camera.
+
 [TurtleBot3 SBC]
+
 ~~~
 ros2 run camera_ros camera_node --ros-args -p format:='RGB888'
 ~~~
 
 Next, run the camera calibration processes, which ensure that the detected lanes are accurately mapped to the robot’s perspective:
-
+[Remote PC]
 ~~~
 ros2 launch turtlebot3_autorace_camera intrinsic_camera_calibration.launch.py
 ros2 launch turtlebot3_autorace_camera extrinsic_camera_calibration.launch.py
@@ -285,6 +287,7 @@ These steps activate intrinsic and extrinsic calibration to correct any distorti
 
 Finally, launch the lane detection node in calibration mode to begin detecting lanes:
 
+[Remote PC]
 ~~~
 ros2 launch turtlebot3_autorace_detect detect_lane.launch.py calibration_mode:=True
 ~~~
@@ -298,11 +301,17 @@ rqt
 Then navigate to Plugins > Visualization > Image View and open three image viewers to display different lane detection results:
 
 * /detect/image_lane/compressed, | /detect/image_yellow_lane_marker/compressed : a yellow range color filtered image. | /detect/image_white_lane_marker/compressed : a white range color filtered image.
-######image#################
+
+
+  <img width="1850" height="499" alt="image" src="https://github.com/user-attachments/assets/7ba0dd03-0b9f-4c12-8b2b-e0ac3aee69be" />
+
+
 
 Navigate to Plugins > Configuration > Dynamic Reconfigure > Select the lane Detect and adjust yellow and white line.
 
-####################image###########################
+
+<img width="1268" height="473" alt="image" src="https://github.com/user-attachments/assets/5e5e8d7f-512e-4f49-9fdc-082286aa0d69" />
+
 
 
 ### Calibrating Lane Detection Parameters
@@ -315,11 +324,23 @@ cd ~/turtlebot3_ws/src/turtlebot3_autorace/turtlebot3_autorace_detect/param/lane
 gedit lane.yaml
 ~~~
 
+<img width="386" height="421" alt="image" src="https://github.com/user-attachments/assets/7216a586-5e89-4052-90bc-9b3854093f10" />
+
+
+
 ### Running Lane Tracking
 Once calibration is complete, restart the lane detection node without the calibration option:
+
+[Remote PC]
+
 ~~~
 ros2 launch turtlebot3_autorace_detect detect_lane.launch.py
 ~~~
+
+
+<img width="738" height="557" alt="image" src="https://github.com/user-attachments/assets/2894a120-a50a-4f90-8703-5f846561d8ad" />
+
+
 
 ### Precaution
 Make Sure Yellow line on Left side and White Line on right otherwise this code will be crash.
@@ -353,6 +374,9 @@ Terminal 4:
 ~~~
 ros2 launch turtlebot3_autorace_mission control_lane.launch.py
 ~~~
+
+################# Add Video ##########################
+
 
 # Part 2: Mapping
 

@@ -381,9 +381,8 @@ ros2 launch turtlebot3_autorace_mission control_lane.launch.py
 # Part 2: Mapping
 
 ## Step 1: Get Offsets:
-This step is very important, First measure the closed line distance manually in meters.
+In this step we need the accurate offsets of our robot, offsets means the yellow and white distance from the robot.
 
-################# image to measure by scale ########################
 
 ### Mathematical calculation to calculate the Lane Offsets:
 #### 1. Pixel Offset of Each Lane Line
@@ -405,6 +404,10 @@ This yields positive offsets for both sides.
 
 #### 2. Conversion From Pixels to Meters
 During manual calibration, the robot is placed at a known physical distance D from the lane line.
+
+
+![WhatsApp Image 2025-12-01 at 10 29 09 AM](https://github.com/user-attachments/assets/3c609f02-ad41-412b-b8b8-0b62360639a6)
+
 Given the measured pixel offset Δx, the scale factor (meters per pixel) is:
 
 $$
@@ -440,7 +443,7 @@ A positive value means the robot is shifted left; a negative value means it is s
 
 ### How to run the code:
 
-First clone the "________________" package. 
+First clone the "slam_lane_tracking_ros2" package. 
 
 First run the gazebo world:
 [TurtleBot3 SBC]
@@ -457,21 +460,27 @@ ros2 launch turtlebot3_autorace_camera extrinsic_camera_calibration.launch.py
 ~~~
 
 Then run you just know the aprrox. distance (in meters) of any closed line to the robot, and then run
+
 ~~~
-ros2 run mapping_lane_tracking lane_offset_fusion --calibration-method manual --known-distance 0.13
+ros2 run slam_lane_tracking_ros2 lane_offsets_logger --calibration-method manual --known-distance 0.013
 ~~~
 
 Then Press enter and your calibration will start
 
-<img width="1062" height="696" alt="image" src="https://github.com/user-attachments/assets/1b63ea19-5898-4fe5-811f-ae1ffefb0824" />
+<img width="1265" height="675" alt="image" src="https://github.com/user-attachments/assets/05935dd6-7751-4fb3-8970-ca3eb18fca79" />
+
+output to visulized the lane offset accurate:
+
+<img width="1001" height="631" alt="Screenshot from 2025-12-01 10-39-33" src="https://github.com/user-attachments/assets/8cc07d20-c8af-4274-8d82-8e5f36a5bd51" />
 
 If you think your measurment is not correct, enter "y" and move the robot little bit and again press enter:
 
-<img width="969" height="649" alt="image" src="https://github.com/user-attachments/assets/637aa682-c338-4e77-8df8-898c8b459424" />
+<img width="960" height="689" alt="image" src="https://github.com/user-attachments/assets/0ab1e86e-b528-4dfd-a0f2-a6e5c0ff55ce" />
+
 
 After this you will get left and right distance of the lane you can see this in image:
 
-<img width="1001" height="665" alt="image" src="https://github.com/user-attachments/assets/3aa4918b-4bc5-4967-a5fe-9d27a4f6ebb1" />
+![calibration_verify_20251201_103939_verify_1](https://github.com/user-attachments/assets/407f5ce2-1b36-47d4-afb1-6678ba840e28)
 
 
 ## Step 2: Run SLAM Node:

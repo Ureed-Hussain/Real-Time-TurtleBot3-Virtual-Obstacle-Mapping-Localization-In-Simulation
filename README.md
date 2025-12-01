@@ -115,19 +115,19 @@ projection
 
  Make sure to update the image_width, image_height values and camera_name to match your actual camera settings. Ensure the camera_name in the .yaml file matches the actual camera name.
 ~~~
-image_width: 320   # Update to your camera's actual resolution
-image_height: 240   # Update to your camera's actual resolution
-camera_name: imx219__base_soc_i2c0mux_i2c_1_imx219_10_320x240   # Replace with the actual camera name
+image_width: 800   # Update to your camera's actual resolution
+image_height: 600   # Update to your camera's actual resolution
+camera_name: ov5647__base_soc_i2c0mux_i2c_1_ov5647_36_800x600   # Replace with the actual camera name
 frame_id: camera
 camera_matrix:
   rows: 3
   cols: 3
-  data: [161.0352, 0, 99.6340, 0, 160.4337, 77.6267, 0, 0, 1]
+  data: [380.74, 0, 406.97, 0, 378.3738, 281.3751, 0, 0, 1]
 distortion_model: plumb_bob
 distortion_coefficients:
   rows: 1
   cols: 5
-  data: [0.1639958, -0.2718400, 0.0010558, -0.0016656, 0]
+  data: [-0.249566, 0.042002, -0.001520, -0.002000, 0]
 rectification_matrix:
   rows: 3
   cols: 3
@@ -135,7 +135,7 @@ rectification_matrix:
 projection_matrix:
   rows: 3
   cols: 4
-  data: [164.6242, 0, 99.2051, 0, 0, 164.5522, 77.7529, 0, 0, 0, 1, 0]
+  data: [261.014, 0, 405.0638, 0, 0, 296.82, 265.354, 0, 0, 0, 1, 0]
 ~~~
 
 ## Step 2: Camera Intrnsic calibration

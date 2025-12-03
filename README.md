@@ -382,7 +382,9 @@ Terminal 4:
 ros2 launch turtlebot3_autorace_mission control_lane.launch.py
 ~~~
 
-################# Add Video ##########################
+
+https://github.com/user-attachments/assets/7079f775-2d3e-493e-a96e-d5011b53c847
+
 
 
 # Part 2: Mapping

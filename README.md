@@ -706,7 +706,7 @@ Then Run
 
 Terminal 5:
 ~~~
-ros2 run mapping_lane_tracking virtual_map_builder
+ros2 run slam_lane_tracking_ros2 virtual_map_builder
 ~~~
 
 In Rviz Windown Change the Map topic to /virtual_map:

@@ -729,6 +729,17 @@ ros2 run nav2_map_server map_saver_cli -f ~/my_virtual_map -t /virtual_map
 
 After saved the map you got two files one is my_virtual_map.pgm file and other is my_virtual_map.yaml 
 
+If you want to store the origin, you can run the following command before making the virtual map.
+
+[Remote PC]
+
+~~~
+ros2 run slam_lane_tracking_ros2 aruco_detector --ros-args -p calibration:=True
+~~~
+
+<img width="3840" height="2160" alt="Snapshot_8" src="https://github.com/user-attachments/assets/0f387e98-9690-4997-9c53-a8d6dc73d367" />
+
+
 # Part 3: Navigation
 
 In this Virtual map Normal parameters of Turtelbot3_navigation2 is not work very well so for this we should update the burger_cam.yaml file:
@@ -757,14 +768,31 @@ cd ~/turtlebot3_ws && colcon build --symlink-install
 
 After Colcon build Open gazebo and load your map.
 
-Terminal 1:
+[TurtleBot3 SBC]
 
 ~~~
-ros2 launch turtlebot3_gazebo turtlebot3_autorace_2020.launch.py
+export TURTLEBOT3_MODEL=burger
+ros2 launch turtlebot3_bringup robot.launch.py
 ~~~
 
+First, find the origin again, for this run:
 
-Terminal 2:
+[Remote PC]
+
+~~~
+ros2 run slam_lane_tracking_ros2 aruco_detector --ros-args -p calibration:=False
+~~~
+
+Show how to set the robot:
+
+
+
+https://github.com/user-attachments/assets/df52656e-a871-4747-9705-629d8bcdbcc3
+
+
+Now load the map and run the navigation:
+
+[Remote PC]
 
 ~~~
 ros2 launch turtlebot3_navigation2 navigation2.launch.py use_sim_time:=True map:=$HOME/my_virtual_map.yaml

@@ -709,16 +709,16 @@ Terminal 5:
 ros2 run slam_lane_tracking_ros2 virtual_map_builder
 ~~~
 
-In Rviz Windown Change the Map topic to /virtual_map:
-
-<img width="1118" height="765" alt="image" src="https://github.com/user-attachments/assets/ee76b199-27fe-424d-a115-94b52a10e31a" />
-
 Terminal 6:
 ~~~
 ros2 launch turtlebot3_autorace_mission control_lane.launch.py
 ~~~
 
-[Screencast from 11-29-2025 11:47:22 PM.webm](https://github.com/user-attachments/assets/b70b8810-495f-49f5-8cd4-aa0e795dfe30)
+
+
+https://github.com/user-attachments/assets/d832c3e2-6cf2-4224-8aa6-6b37f9685661
+
+
 
 When robot explore the full map then run the command to save the map:
 
@@ -726,8 +726,6 @@ Terminal 7:
 ~~~
 ros2 run nav2_map_server map_saver_cli -f ~/my_virtual_map -t /virtual_map
 ~~~
-
-<img width="613" height="510" alt="image" src="https://github.com/user-attachments/assets/b6e0530a-0549-4053-b5c1-9b2083350b55" />
 
 After saved the map you got two files one is my_virtual_map.pgm file and other is my_virtual_map.yaml 
 

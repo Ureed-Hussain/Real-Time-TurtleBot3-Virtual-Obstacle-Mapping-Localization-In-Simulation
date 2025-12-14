@@ -523,8 +523,65 @@ ros2 run nav2_map_server map_saver_cli -f ~/check2
  
 <img width="783" height="347" alt="image" src="https://github.com/user-attachments/assets/4df36186-2b88-4915-bc50-5db60a069cb5" />
 
+## Step 3: Aruco Tag Store the origin:
 
-## Step 3: Run Virtual Map Builder:
+If you want to store the origin, you can run the following command before making the virtual map.
+
+### Mathematics and Logic Behind
+
+#### 1. ArUco Pose Estimation (Camera → Marker)
+Using camera calibration and known marker size, OpenCV solves a **PnP problem**:
+
+t = [ x  y  z ]ᵀ  
+r ∈ ℝ³
+
+- t : marker position w.r.t. camera (meters)
+- r : rotation vector (axis–angle)
+  
+**Distance to marker:**
+
+d = √(x² + y² + z²)
+
+---
+
+#### 2. Rotation Vector → Quaternion
+
+Rotation vector is converted to a rotation matrix using Rodrigues’ formula:
+
+R = Rodrigues(r)
+
+Then converted to a quaternion:
+
+q = (qₓ, qᵧ, q_z, q_w)
+
+---
+
+#### 3. Saved Origin (Reference Pose)
+
+At calibration time, the system stores:
+
+- Robot pose (odometry):
+  pᵣ⁰ , qᵣ⁰
+
+- Marker pose (camera frame):
+  pₘ⁰ , qₘ⁰
+
+---
+
+
+   
+
+[Remote PC]
+
+~~~
+ros2 run slam_lane_tracking_ros2 aruco_detector --ros-args -p calibration:=True
+~~~
+
+<img width="3840" height="2160" alt="Snapshot_8" src="https://github.com/user-attachments/assets/0f387e98-9690-4997-9c53-a8d6dc73d367" />
+
+
+
+## Step 4: Run Virtual Map Builder:
 
 ### Mathematics and Logic Behind
 
@@ -715,7 +772,6 @@ ros2 launch turtlebot3_autorace_mission control_lane.launch.py
 ~~~
 
 
-
 https://github.com/user-attachments/assets/d832c3e2-6cf2-4224-8aa6-6b37f9685661
 
 
@@ -729,20 +785,12 @@ ros2 run nav2_map_server map_saver_cli -f ~/my_virtual_map -t /virtual_map
 
 After saved the map you got two files one is my_virtual_map.pgm file and other is my_virtual_map.yaml 
 
-If you want to store the origin, you can run the following command before making the virtual map.
-
-[Remote PC]
-
-~~~
-ros2 run slam_lane_tracking_ros2 aruco_detector --ros-args -p calibration:=True
-~~~
-
-<img width="3840" height="2160" alt="Snapshot_8" src="https://github.com/user-attachments/assets/0f387e98-9690-4997-9c53-a8d6dc73d367" />
-
 
 # Part 3: Navigation
 
 In this Virtual map Normal parameters of Turtelbot3_navigation2 is not work very well so for this we should update the burger_cam.yaml file:
+
+## Step 1: Change Robot Size and Inflation Radius:
 
 which is located:
  
@@ -775,6 +823,66 @@ export TURTLEBOT3_MODEL=burger
 ros2 launch turtlebot3_bringup robot.launch.py
 ~~~
 
+## Step 2: Find Origin:
+
+### Mathematics and Logic Behind
+
+#### 1. Position Error (Odometry)
+
+e_p = pᵣ − pᵣ⁰
+
+Component-wise:
+
+eₓ = x − x₀  
+eᵧ = y − y₀  
+e_z = z − z₀
+
+---
+
+#### 2. Orientation Error (Quaternion)
+
+Quaternion inverse:
+
+q⁻¹ = (−x, −y, −z, w)
+
+Orientation error:
+
+q_err = q_current ⊗ q_reference⁻¹
+
+---
+
+#### 3. Rotation Angle Error
+
+Extract angle from quaternion:
+
+θ = 2 · acos(q_w)
+
+θ_deg = θ · (180 / π)
+
+---
+
+#### 4. Marker-Based Error
+
+Marker position error:
+
+eₘ = pₘ − pₘ⁰
+
+Marker distance:
+
+dₘ = |eₘ|
+
+---
+
+#### 5. Guidance Logic (Threshold-Based)
+
+
+If all conditions are met → **robot is aligned with saved origin**.
+
+---
+
+
+
+
 First, find the origin again, for this run:
 
 [Remote PC]
@@ -783,12 +891,12 @@ First, find the origin again, for this run:
 ros2 run slam_lane_tracking_ros2 aruco_detector --ros-args -p calibration:=False
 ~~~
 
-Show how to set the robot:
-
+How to set the robot:
 
 
 https://github.com/user-attachments/assets/df52656e-a871-4747-9705-629d8bcdbcc3
 
+## Step 3: Load the map
 
 Now load the map and run the navigation:
 
@@ -807,7 +915,7 @@ https://github.com/user-attachments/assets/91d3d0c7-6781-4009-b6cc-e7c03e800af7
 
 
 
-## Future Work
+# Future Work
 In future work, a key improvement is to increase the reliability of navigation, as the robot occasionally drifts outside the intended driving corridor. A promising solution is to replace the standard global costmap with a lane-corridor mask generated directly from the lane-detection system. By converting the detected lane boundaries into an occupancy mask—where all pixels outside the lane are marked as obstacles (100) and all pixels inside the lane are marked as free space (0)—Nav2 will be constrained to plan only within the lane. This approach effectively transforms the TurtleBot3 into a lane-aware autonomous robot, similar to the behavior of real self-driving cars, and can significantly improve path-planning accuracy and stability.
 
 
